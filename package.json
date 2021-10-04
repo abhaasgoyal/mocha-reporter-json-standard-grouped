@@ -1,17 +1,13 @@
 {
-	"name": "mocha-reporter-json-standard",
+	"name": "mocha-suite-reporter",
 	"version": "1.0.0",
-	"description": "Report Mocha test runner output to a standardized CI tooling output JSON format",
+	"description": "Report Mocha test runner output in a compact way, grouping together all succesfull results belonging to the same suite",
 	"main": "dist/index.js",
 	"files": [
 		"/dist/*.js",
 		"!/dist/check-general.*",
 		"!/dist/*.test.*"
 	],
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/agyemanjp/mocha-reporter-json-standard.git"
-	},
 	"keywords": [
 		"mocha",
 		"mocha-reporter",
@@ -19,11 +15,8 @@
 	],
 	"license": "MIT",
 	"author": "James Prempeh <agyemanjp@danfortsystems.com>",
-	"bugs": {
-		"url": "https://github.com/agyemanjp/mocha-reporter-json-standard/issues"
-	},
-	"homepage": "https://github.com/agyemanjp/mocha-reporter-json-standard#readme",
 	"scripts": {
+		"prepare": "npm run build",
 		"setup": "rm -rf ./node_modules package-lock.json && npm install",
 		"clean": "rm -rf dist .eslintcache *-report.json src/check-general.ts ",
 		"schema": "json2ts ./src/check-general.schema.json ./src/check-general.ts",
