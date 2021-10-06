@@ -43,14 +43,16 @@ module.exports = function (this: unknown, runner: Runner) {
 	})
 
 	runner.on(EVENT_RUN_END, function () {
-		const succesfullSuiteNames = Object.keys(rootSuites).filter(sName => rootSuites[sName].every(t => t.state === "passed"))
+		const successfulSuiteNames = Object.keys(rootSuites).filter(sName => rootSuites[sName].every(t => t.state === "passed"))
 		const individualFailures = individualTests.filter(t => t.state !== "passed")
+
+		results.counts.notice = successfulSuiteNames.length
 		results.counts.failure = individualFailures.length
 		results.byFile["General"] = {
 			summary: "",
-			counts: { failure: individualFailures.length, warning: 0, notice: 0 },
+			counts: { failure: results.counts.failure, warning: 0, notice: results.counts.notice },
 			details: [
-				...succesfullSuiteNames.map((sName, i) => ({
+				...successfulSuiteNames.map((sName, i) => ({
 					Id: `success-${i}`,
 					title: sName,
 					message: `${rootSuites[sName].length} tests passed`,
