@@ -1,6 +1,6 @@
 {
-	"name": "mocha-suite-reporter",
-	"version": "1.0.0",
+	"name": "mocha-reporter-json-standard-grouped",
+	"version": "0.1.0",
 	"description": "Report Mocha test runner output in a compact way, grouping together all succesfull results belonging to the same suite",
 	"main": "dist/index.js",
 	"files": [
