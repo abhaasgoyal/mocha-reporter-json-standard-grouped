@@ -80,5 +80,3 @@ export default class MochaGroupedReporter extends reporters.Base {
 const getTopMostTitledSuite = (suite: Suite): Suite => {
 	return (suite.parent === undefined || suite.parent.title === "") ? suite : getTopMostTitledSuite(suite.parent)
 }
-
-module.exports = MochaGroupedReporter
