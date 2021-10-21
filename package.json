@@ -1,7 +1,7 @@
 {
 	"name": "mocha-reporter-json-standard-grouped",
 	"version": "0.1.0",
-	"description": "Report Mocha test runner output in a compact way, grouping together all succesfull results belonging to the same suite",
+	"description": "Report Mocha test runner output in a compact way, grouping together all succesful results belonging to the same suite",
 	"main": "dist/index.js",
 	"files": [
 		"/dist/*.js",
@@ -22,7 +22,7 @@
 		"schema": "json2ts ./src/check-general.schema.json ./src/check-general.ts",
 		"lint": "eslint --ext ts --cache src/*",
 		"build": "npm run schema && tsc && flatten dist && rm -rf dist/*.test.d.ts dist/*.test.js.map",
-		"test": "mocha dist/*.test.js --reporter dist/index.js >| ./test-report.json",
+		"test": "mocha dist/*.test.js",
 		"ci": "npm run clean && npm run lint && npm run build && npm run test",
 		"testpub": "npm publish --dry-run && npm install . -g"
 	},
