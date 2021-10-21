@@ -1,14 +1,14 @@
 import * as assert from "assert"
 // import * as childProcess from "child_process"
 import Mocha from "mocha"
-import MochaGroupedReporter from "../src/index"
+import MochaGroupedReporter from "./index"
 
 const { Runner, Suite, Test } = Mocha
 
 const exampleErrObj = { expected: 1, actual: 2 }
 const generateTest = (title: string, doneFn: any) => new Test(title, doneFn)
 const passingTest = (title: string) => generateTest(title, () => {})
-const failingTest = (title: string) => generateTest(title, () => tDone => tDone(new assert.AssertionError(exampleErrObj)))
+const failingTest = (title: string) => generateTest(title, tDone => tDone(new assert.AssertionError(exampleErrObj)))
 
 
 describe('Grouped Mocha Test Reporter', () => {

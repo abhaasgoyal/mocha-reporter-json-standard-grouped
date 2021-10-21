@@ -3,6 +3,10 @@
 		"target": "es6",
 		"module": "commonjs",
 		"outDir": "dist",
+		"rootDirs": [
+			"src",
+			"test"
+		],
 		"strict": true,
 		"noImplicitAny": false,
 		"esModuleInterop": true,
