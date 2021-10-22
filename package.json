@@ -22,7 +22,7 @@
 		"schema": "json2ts ./src/check-general.schema.json ./src/check-general.ts",
 		"lint": "eslint --ext ts --cache src/*",
 		"build": "npm run schema && tsc && flatten dist && rm -rf dist/*.test.d.ts dist/*.test.js.map",
-		"test": "mocha dist/*.test.js",
+		"test": "mocha --require ts-node/register test/*.test.*",
 		"ci": "npm run clean && npm run lint && npm run build && npm run test",
 		"testpub": "npm publish --dry-run && npm install . -g"
 	},
@@ -39,6 +39,7 @@
 		"json-schema-to-typescript": "^9.1.0",
 		"mocha": "8.0.1",
 		"source-map-support": "^0.5.19",
+		"ts-node": "^8.10.2",
 		"typescript": "3.9.3"
 	},
 	"dependencies": {}

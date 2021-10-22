@@ -1,7 +1,7 @@
 import * as assert from "assert"
 // import * as childProcess from "child_process"
 import Mocha from "mocha"
-import MochaGroupedReporter from "./index"
+import MochaGroupedReporter from "../dist/index"
 
 const { Runner, Suite, Test } = Mocha
 
@@ -80,6 +80,7 @@ describe('Grouped Mocha Test Reporter', () => {
 			})
 		})
 
+		// Do tests like certain categories of conditions
 		it('should have 2 passing, 5 failing tests', function(done) {
 			const nPassingTests = 2
 			const nFailingTests = 5

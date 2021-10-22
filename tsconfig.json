@@ -5,7 +5,6 @@
 		"outDir": "dist",
 		"rootDirs": [
 			"src",
-			"test"
 		],
 		"strict": true,
 		"noImplicitAny": false,
@@ -20,6 +19,5 @@
 	],
 	"include": [
 		"src",
-		"test"
 	]
 }
