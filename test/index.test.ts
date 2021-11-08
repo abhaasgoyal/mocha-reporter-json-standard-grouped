@@ -1,8 +1,8 @@
 import * as assert from "assert"
 // import * as childProcess from "child_process"
-import Mocha, { Func, AsyncFunc, Stats } from "mocha"
+import Mocha, { Func, AsyncFunc } from "mocha"
 import MochaGroupedReporter from "../dist/index"
-import createStatsCollector from "mocha/lib/stats-collector"
+import { ReporterOptions } from "../src/types"
 
 const { Runner, Suite, Test } = Mocha
 
@@ -10,14 +10,20 @@ const exampleErrObj = { expected: 1, actual: 2 }
 const generateTest = (title: string, doneFn?: Func | AsyncFunc) => new Test(title, doneFn)
 const passingTest = (title: string) => generateTest(title, () => { })
 const failingTest = (title: string) => generateTest(title, tDone => tDone(new assert.AssertionError(exampleErrObj)))
-
+const testReporterOptions: ReporterOptions = {
+	quiet: true,
+	saveJSONFile: false,
+	saveJSONVar: false,
+	reportFileName: '',
+	reportData: ''
+}
 
 describe('Grouped Mocha Test Reporter', () => {
 
 	let mocha: Mocha
 	let suite: Mocha.Suite
 	let runner: Mocha.Runner
-	let mochaReporter: Mocha.reporters.Base
+	let mochaReporter: typeof MochaGroupedReporter
 	let subSuite1: Mocha.Suite
 
 	beforeEach(() => {
@@ -26,11 +32,11 @@ describe('Grouped Mocha Test Reporter', () => {
 			reporter: MochaGroupedReporter
 		})
 		suite = new Suite("")
+		suite.root = true
 		subSuite1 = new Suite("Group 1")
 		runner = new Runner(suite, false)
 		suite.addSuite(subSuite1)
-		createStatsCollector(runner)
-		mochaReporter = new (<any>mocha)._reporter(runner, {})
+		mochaReporter = new (<any>mocha)._reporter(runner, testReporterOptions)
 	})
 
 	describe("0/1 suite tests", () => {
@@ -38,7 +44,6 @@ describe('Grouped Mocha Test Reporter', () => {
 		it('should have 0 passing test if empty suite', function(done) {
 			runner.run(failureCount => {
 				assert.strictEqual(failureCount, 0)
-				console.log(mochaReporter)
 				done()
 			})
 		})
@@ -94,6 +99,7 @@ describe('Grouped Mocha Test Reporter', () => {
 			}
 			runner.run(failureCount => {
 				assert.strictEqual(failureCount, nFailingTests)
+				// console.log((<any>mochaReporter).reportData)
 				done()
 			})
 		})

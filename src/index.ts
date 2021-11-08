@@ -2,26 +2,31 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable fp/no-mutation */
 
-import { Runner, reporters, Test, Suite, MochaOptions } from 'mocha'
+import { Runner, reporters, Test, Suite, MochaOptions, Stats } from 'mocha'
 import { CheckGeneralSchema } from "./check-general"
+import { ReporterOptions } from "./types"
+
+const Date = global.Date
 
 export default class MochaGroupedReporter extends reporters.Base {
-	// TODO: Make a type for reporter options
+
+	reportData: string
+	stats!: Stats
 
 	constructor(runner: Runner, options: MochaOptions) {
 		super(runner, options)
+		reporters.Base.call(this, runner, options)
+		this.reportData = ""
 
 		const {
+			EVENT_RUN_BEGIN,
+			EVENT_SUITE_BEGIN,
 			EVENT_RUN_END,
 			EVENT_SUITE_END,
 			EVENT_TEST_PASS,
-			EVENT_TEST_FAIL
+			EVENT_TEST_FAIL,
+			EVENT_TEST_END
 		} = Runner.constants
-		reporters.Base.call(this, runner)
-
-
-		const individualTests: Test[] = []
-		const rootSuites: { [key: string]: Test[] } = {}
 
 		const results: CheckGeneralSchema = {
 			name: "Mocha unit tests",
@@ -31,9 +36,42 @@ export default class MochaGroupedReporter extends reporters.Base {
 			byFile: {},
 		}
 
-		// TODO: Set reporter options
-		runner.on(EVENT_SUITE_END, suite => {
-			if (suite.title !== "") {
+		this.stats = {
+			suites: 0,
+			tests: 0,
+			passes: 0,
+			pending: 0,
+			failures: 0
+		} as Stats
+
+		const reporterOptions: ReporterOptions = {
+			quiet: false,
+			saveJSONVar: false,
+			saveJSONFile: false,
+			reportFileName: '',
+			reportData: '',
+			...options
+		}
+
+		const individualTests: Test[] = []
+		const rootSuites: { [key: string]: Test[] } = {}
+
+		runner.once(EVENT_RUN_BEGIN, () => {
+			this.stats.start = new Date()
+		})
+
+		runner.on(EVENT_SUITE_BEGIN, (suite) => {
+			if (suite.root !== true) {
+				this.stats.suites++
+			}
+		})
+
+		runner.on(EVENT_TEST_END, () => {
+			this.stats.tests++
+		})
+
+		runner.on(EVENT_SUITE_END, (suite) => {
+			if (suite.root !== true) {
 				const topMostSuite = getTopMostTitledSuite(suite)
 				const existingTopSuite = rootSuites[topMostSuite.title]
 				rootSuites[topMostSuite.title] = existingTopSuite !== undefined
@@ -42,19 +80,20 @@ export default class MochaGroupedReporter extends reporters.Base {
 			}
 		})
 
-		runner.on(EVENT_TEST_PASS, function(test) {
+		runner.on(EVENT_TEST_PASS, (test) => {
 			individualTests.push(test)
 		})
 
-		runner.on(EVENT_TEST_FAIL, function(test) {
+		runner.on(EVENT_TEST_FAIL, (test) => {
 			individualTests.push(test)
+			this.stats.failures++
 		})
 
-		runner.on(EVENT_RUN_END, function() {
+		runner.on(EVENT_RUN_END, () => {
 			const successfulSuiteNames = Object.keys(rootSuites).filter(sName => rootSuites[sName].every(t => t.state === "passed"))
 			const individualFailures = individualTests.filter(t => t.state !== "passed")
 
-			results.counts.notice = successfulSuiteNames.length
+			this.stats.passes = results.counts.notice = successfulSuiteNames.length
 			results.counts.failure = individualFailures.length
 			results.byFile["General"] = {
 				summary: "",
@@ -76,9 +115,12 @@ export default class MochaGroupedReporter extends reporters.Base {
 				]
 			} // as CheckGeneralSchema["byFile"]
 
-			console.log(JSON.stringify(results, null, 2))
-
-			// TODO: Pass in reporterOptions for boolean to save in a particular file, get the saved file and compare it to the test file required
+			const reportData: string = JSON.stringify(results, null, 2)
+			if (reporterOptions.quiet !== true) {
+				console.log(reportData)
+			}
+			this.reportData = reportData
+			this.stats.end = new Date()
 		})
 	}
 }
