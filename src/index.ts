@@ -2,13 +2,14 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable fp/no-mutation */
 
-import { Runner, reporters, Test, Suite } from 'mocha'
+import { Runner, reporters, Test, Suite, MochaOptions } from 'mocha'
 import { CheckGeneralSchema } from "./check-general"
 
 export default class MochaGroupedReporter extends reporters.Base {
+	// TODO: Make a type for reporter options
 
-	constructor(runner: Runner) {
-		super(runner)
+	constructor(runner: Runner, options: MochaOptions) {
+		super(runner, options)
 
 		const {
 			EVENT_RUN_END,
@@ -17,6 +18,7 @@ export default class MochaGroupedReporter extends reporters.Base {
 			EVENT_TEST_FAIL
 		} = Runner.constants
 		reporters.Base.call(this, runner)
+
 
 		const individualTests: Test[] = []
 		const rootSuites: { [key: string]: Test[] } = {}
@@ -28,6 +30,8 @@ export default class MochaGroupedReporter extends reporters.Base {
 			counts: { failure: 0, warning: 0, notice: 0 },
 			byFile: {},
 		}
+
+		// TODO: Set reporter options
 		runner.on(EVENT_SUITE_END, suite => {
 			if (suite.title !== "") {
 				const topMostSuite = getTopMostTitledSuite(suite)
@@ -73,6 +77,8 @@ export default class MochaGroupedReporter extends reporters.Base {
 			} // as CheckGeneralSchema["byFile"]
 
 			console.log(JSON.stringify(results, null, 2))
+
+			// TODO: Pass in reporterOptions for boolean to save in a particular file, get the saved file and compare it to the test file required
 		})
 	}
 }
