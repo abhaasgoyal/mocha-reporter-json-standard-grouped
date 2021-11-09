@@ -54,46 +54,14 @@ describe('Grouped Mocha Test Reporter', () => {
 		initReporter = createMochaReporter(mocha, runner)
 	})
 
-	describe("0/1 suite tests", () => {
-
-		it('work on empty suite', function(done) {
-			mochaReporter = initReporter(defaultReporterOptions)
-			runner.run(_ => {
-				assert.deepStrictEqual({
-					"suites": 0,
-					"tests": 0,
-					"passes": 0,
-					"pending": 0,
-					"failures": 0
-				},
-					mochaReporter.stats)
-				done()
-			})
-		})
-
-		it('should have 1 passing test', function(done) {
-			mochaReporter = initReporter(defaultReporterOptions)
-			const test = passingTest("Passing Test")
-			subSuite1.addTest(test)
-			runner.run(_ => {
-				assert.deepStrictEqual({
-					"suites": 1,
-					"tests": 1,
-					"passes": 1,
-					"pending": 0,
-					"failures": 0
-				},
-					mochaReporter.stats)
-				done()
-			})
-		})
-
-		it('should match defined schema on using saveJSONVar', function(done) {
+	describe("Reporter Option Tests", () => {
+		it('should match defined schema on using saveJSONVar (single suite)', function(done) {
 			const nTests = 7
 			mochaReporter = initReporter({
 				...defaultReporterOptions,
 				saveJSONVar: true
 			})
+
 
 			for (let i: number = 0; i < nTests; i++) {
 				subSuite1.addTest(passingTest(`passing test ${i}`))
@@ -112,7 +80,100 @@ describe('Grouped Mocha Test Reporter', () => {
 			})
 		})
 
-		it('should have 1 failure', function(done) {
+		it('should match defined schema on using saveJSONVar (multi suite)', function(done) {
+			const nPassSuites = 4
+			const nFailSuites = 5
+			mochaReporter = initReporter({
+				...defaultReporterOptions,
+				saveJSONVar: true
+			})
+
+			for (let i: number = 0; i < nPassSuites; i++) {
+				let subSuite: Mocha.Suite = new Suite(`Group ${i + 1}`)
+				suite.addSuite(subSuite)
+				for (let j: number = 0; j <= i; j++) {
+					subSuite.addTest(passingTest(`passing test ${i}`))
+				}
+
+			}
+			for (let i: number = 0; i < nFailSuites; i++) {
+				let subSuite: Mocha.Suite = new Suite(`Group ${i + nPassSuites + 1} `)
+				suite.addSuite(subSuite)
+				for (let j: number = 0; j <= i; j++) {
+					subSuite.addTest(failingTest(`failing test ${i}`))
+				}
+
+			}
+
+			runner.run(_ => {
+				sampleFileCompare('test/sample-multi-suite.json', mochaReporter)
+				assert.deepStrictEqual({
+					"suites": 9,
+					"tests": 25,
+					"passes": 4,
+					"pending": 0,
+					"failures": 15
+				},
+					mochaReporter.stats)
+				done()
+			})
+		})
+		it('should save files to reportFileName on saveJSONFile', function(done) {
+			const nTests = 7
+			mochaReporter = initReporter({
+				...defaultReporterOptions,
+				saveJSONFile: true,
+				reportFileName: "test/temp-sample.json"
+			})
+			for (let i: number = 0; i < nTests; i++) {
+				subSuite1.addTest(passingTest(`passing test ${i}`))
+			}
+			runner.run(_ => {
+				let actualData = fs.readFileSync("test/temp-sample.json", "utf-8")
+				let expectedData = fs.readFileSync("test/sample-single-suite.json", "utf-8")
+				assert.strictEqual(actualData + "\n", expectedData)
+				fs.unlinkSync("test/temp-sample.json")
+				done()
+			})
+		})
+	})
+
+	describe("Empty and single suite tests", () => {
+
+		it('work on empty suite', function(done) {
+			mochaReporter = initReporter(defaultReporterOptions)
+			runner.run(_ => {
+				assert.deepStrictEqual({
+					"suites": 0,
+					"tests": 0,
+					"passes": 0,
+					"pending": 0,
+					"failures": 0
+				},
+					mochaReporter.stats)
+				done()
+			})
+		})
+
+		it('Basic passing test', function(done) {
+			mochaReporter = initReporter(defaultReporterOptions)
+			const test = passingTest("Passing Test")
+			subSuite1.addTest(test)
+			runner.run(_ => {
+				assert.deepStrictEqual({
+					"suites": 1,
+					"tests": 1,
+					"passes": 1,
+					"pending": 0,
+					"failures": 0
+				},
+					mochaReporter.stats)
+				done()
+			})
+		})
+
+
+		it('Basic Failure Tests', function(done) {
 			mochaReporter = initReporter(defaultReporterOptions)
 			const test = failingTest('failing test')
 			subSuite1.addTest(test)
@@ -129,7 +190,7 @@ describe('Grouped Mocha Test Reporter', () => {
 			})
 		})
 
-		it('should list every failed test', function(done) {
+		it('Multi failure test', function(done) {
 			mochaReporter = initReporter(defaultReporterOptions)
 			const nTests = genRandNat(10)
 			for (let i: number = 0; i < nTests; i++) {
@@ -143,13 +204,13 @@ describe('Grouped Mocha Test Reporter', () => {
 					"pending": 0,
 					"failures": nTests
 				},
-				mochaReporter.stats)
+					mochaReporter.stats)
 				done()
 			})
 
 		})
 
-		it('should list only the failed tests on group of passing and failing tests', function(done) {
+		it('should list only the failed tests on mixture of passing and failing tests', function(done) {
 			mochaReporter = initReporter(defaultReporterOptions)
 			const nPassingTests = genRandNat(10)
 			const nFailingTests = genRandNat(10)
@@ -167,7 +228,7 @@ describe('Grouped Mocha Test Reporter', () => {
 					"pending": 0,
 					"failures": nFailingTests
 				},
-				mochaReporter.stats)
+					mochaReporter.stats)
 				done()
 			})
 		})
@@ -176,7 +237,7 @@ describe('Grouped Mocha Test Reporter', () => {
 
 	describe("MultiSuite Tests", () => {
 
-		it('should have 1 passing test in 2 suites', function(done) {
+		it('Basic Passing Tests', function(done) {
 			mochaReporter = initReporter(defaultReporterOptions)
 			let subSuite2: Mocha.Suite = new Suite("Group 2")
 			suite.addSuite(subSuite2)
@@ -192,12 +253,12 @@ describe('Grouped Mocha Test Reporter', () => {
 					"pending": 0,
 					"failures": 0
 				},
-				mochaReporter.stats)
+					mochaReporter.stats)
 				done()
 			})
 		})
 
-		it('should have 1 passing/1 failing test in 2 suites', function(done) {
+		it('Mixture of Passing and Failing Tests', function(done) {
 			mochaReporter = initReporter(defaultReporterOptions)
 			let subSuite2: Mocha.Suite = new Suite("Group 2")
 			suite.addSuite(subSuite2)
@@ -212,7 +273,7 @@ describe('Grouped Mocha Test Reporter', () => {
 					"pending": 0,
 					"failures": 1
 				},
-				mochaReporter.stats)
+					mochaReporter.stats)
 				done()
 			})
 		})
