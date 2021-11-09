@@ -1,5 +1,11 @@
+/*
+ * TODO:
+ * Tests for
+ * 1. testReporterOptions
+ * 2. reporterStats = suites passed failed pending total
+ */
 import * as assert from "assert"
-// import * as childProcess from "child_process"
+import * as fs from "fs"
 import Mocha, { Func, AsyncFunc } from "mocha"
 import MochaGroupedReporter from "../dist/index"
 import { ReporterOptions } from "../src/types"
@@ -7,16 +13,26 @@ import { ReporterOptions } from "../src/types"
 const { Runner, Suite, Test } = Mocha
 
 const exampleErrObj = { expected: 1, actual: 2 }
+const defaultReporterOptions: ReporterOptions = {
+	quiet: true, // Not display output schema on console
+	saveJSONFile: false,
+	saveJSONVar: false, // Save to JSON variable for persistence after `Runner`
+	reportFileName: '', // Report filename when file is saved
+}
+
+const createMochaReporter = (mocha: Mocha,
+	runner: Mocha.Runner) =>
+	(reporterOptions: ReporterOptions) =>
+		new (<any>mocha)._reporter(runner, reporterOptions)
 const generateTest = (title: string, doneFn?: Func | AsyncFunc) => new Test(title, doneFn)
 const passingTest = (title: string) => generateTest(title, () => { })
 const failingTest = (title: string) => generateTest(title, tDone => tDone(new assert.AssertionError(exampleErrObj)))
-const testReporterOptions: ReporterOptions = {
-	quiet: true,
-	saveJSONFile: false,
-	saveJSONVar: false,
-	reportFileName: '',
-	reportData: ''
+const sampleFileCompare = (fileName: string, mochaReporter: typeof MochaGroupedReporter) => {
+	let expectedFileString = fs.readFileSync(fileName, 'utf-8')
+	assert.strictEqual(expectedFileString, (<any>mochaReporter).reportData + "\n")
 }
+
+const genRandNat = (max: number) => Math.floor(Math.random() * max) + 1
 
 describe('Grouped Mocha Test Reporter', () => {
 
@@ -25,6 +41,7 @@ describe('Grouped Mocha Test Reporter', () => {
 	let runner: Mocha.Runner
 	let mochaReporter: typeof MochaGroupedReporter
 	let subSuite1: Mocha.Suite
+	let initReporter: (ReporterOptions: ReporterOptions) => typeof MochaGroupedReporter
 
 	beforeEach(() => {
 
@@ -36,12 +53,13 @@ describe('Grouped Mocha Test Reporter', () => {
 		subSuite1 = new Suite("Group 1")
 		runner = new Runner(suite, false)
 		suite.addSuite(subSuite1)
-		mochaReporter = new (<any>mocha)._reporter(runner, testReporterOptions)
+		initReporter = createMochaReporter(mocha, runner)
 	})
 
 	describe("0/1 suite tests", () => {
 
-		it('should have 0 passing test if empty suite', function(done) {
+		it('work on empty suite', function(done) {
+			mochaReporter = initReporter(defaultReporterOptions)
 			runner.run(failureCount => {
 				assert.strictEqual(failureCount, 0)
 				done()
@@ -57,12 +75,18 @@ describe('Grouped Mocha Test Reporter', () => {
 			})
 		})
 
-		it('should group 7 passing tests in one group', function(done) {
+		it('should match defined schema on using saveJSONVar', function(done) {
 			const nTests = 7
+			mochaReporter = initReporter({
+				...defaultReporterOptions,
+				saveJSONVar: true
+			})
+
 			for (let i: number = 0; i < nTests; i++) {
 				subSuite1.addTest(passingTest(`passing test ${i}`))
 			}
 			runner.run(failureCount => {
+				sampleFileCompare('test/sample-single-suite.json', mochaReporter)
 				assert.strictEqual(failureCount, 0)
 				done()
 			})
@@ -134,5 +158,3 @@ describe('Grouped Mocha Test Reporter', () => {
 		})
 	})
 })
-
-const genRandNat = (max: number) => Math.floor(Math.random() * max) + 1

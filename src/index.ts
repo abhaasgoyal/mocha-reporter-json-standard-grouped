@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable fp/no-mutation */
 
+import * as fs from 'fs'
 import { Runner, reporters, Test, Suite, MochaOptions, Stats } from 'mocha'
 import { CheckGeneralSchema } from "./check-general"
 import { ReporterOptions } from "./types"
@@ -10,13 +11,13 @@ const Date = global.Date
 
 export default class MochaGroupedReporter extends reporters.Base {
 
-	reportData: string
+	reportData: string | null
 	stats!: Stats
 
 	constructor(runner: Runner, options: MochaOptions) {
 		super(runner, options)
 		reporters.Base.call(this, runner, options)
-		this.reportData = ""
+		this.reportData = null
 
 		const {
 			EVENT_RUN_BEGIN,
@@ -48,8 +49,6 @@ export default class MochaGroupedReporter extends reporters.Base {
 			quiet: false,
 			saveJSONVar: false,
 			saveJSONFile: false,
-			reportFileName: '',
-			reportData: '',
 			...options
 		}
 
@@ -116,15 +115,27 @@ export default class MochaGroupedReporter extends reporters.Base {
 			} // as CheckGeneralSchema["byFile"]
 
 			const reportData: string = JSON.stringify(results, null, 2)
+
 			if (reporterOptions.quiet !== true) {
 				console.log(reportData)
 			}
-			this.reportData = reportData
+			if (reporterOptions.saveJSONVar === true) {
+				this.reportData = reportData
+			}
+
+			if (reporterOptions.saveJSONFile === true) {
+				if (typeof reporterOptions.reportFileName === "string") {
+					fs.writeFileSync(reporterOptions.reportFileName, reportData)
+				}
+				else {
+					throw new Error("reportFileName is possibly undefined")
+				}
+			}
 			this.stats.end = new Date()
 		})
 	}
 }
 
 const getTopMostTitledSuite = (suite: Suite): Suite => {
-	return (suite.parent === undefined || suite.parent.title === "") ? suite : getTopMostTitledSuite(suite.parent)
+	return (suite.parent === undefined || suite.parent.root) ? suite : getTopMostTitledSuite(suite.parent)
 }
