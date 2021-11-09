@@ -1,0 +1,29 @@
+{
+  "name": "Mocha unit tests",
+  "description": "Mocha unit tests",
+  "summary": "",
+  "counts": {
+    "failure": 0,
+    "warning": 0,
+    "notice": 1
+  },
+  "byFile": {
+    "General": {
+      "summary": "",
+      "counts": {
+        "failure": 0,
+        "warning": 0,
+        "notice": 1
+      },
+      "details": [
+        {
+          "Id": "success-0",
+          "title": "Group 1",
+          "message": "7 tests passed",
+          "category": "notice",
+          "rawDetails": "passing test 0\npassing test 1\npassing test 2\npassing test 3\npassing test 4\npassing test 5\npassing test 6"
+        }
+      ]
+    }
+  }
+}
