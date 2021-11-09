@@ -7,20 +7,17 @@ import { Runner, reporters, Test, Suite, MochaOptions, Stats } from 'mocha'
 import { CheckGeneralSchema } from "./check-general"
 import { ReporterOptions } from "./types"
 
-const Date = global.Date
 
 export default class MochaGroupedReporter extends reporters.Base {
 
-	reportData: string | null
+	reportData?: string
 	stats!: Stats
 
 	constructor(runner: Runner, options: MochaOptions) {
 		super(runner, options)
 		reporters.Base.call(this, runner, options)
-		this.reportData = null
 
 		const {
-			EVENT_RUN_BEGIN,
 			EVENT_SUITE_BEGIN,
 			EVENT_RUN_END,
 			EVENT_SUITE_END,
@@ -54,10 +51,6 @@ export default class MochaGroupedReporter extends reporters.Base {
 
 		const individualTests: Test[] = []
 		const rootSuites: { [key: string]: Test[] } = {}
-
-		runner.once(EVENT_RUN_BEGIN, () => {
-			this.stats.start = new Date()
-		})
 
 		runner.on(EVENT_SUITE_BEGIN, (suite) => {
 			if (suite.root !== true) {
@@ -131,7 +124,6 @@ export default class MochaGroupedReporter extends reporters.Base {
 					throw new Error("reportFileName is possibly undefined")
 				}
 			}
-			this.stats.end = new Date()
 		})
 	}
 }
