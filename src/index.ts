@@ -8,7 +8,7 @@ import { CheckGeneralSchema } from "./check-general"
 import { ReporterOptions } from "./types"
 
 
-export default class MochaGroupedReporter extends reporters.Base {
+class MochaGroupedReporter extends reporters.Base {
 
 	reportData?: string
 	stats: Stats
@@ -127,3 +127,5 @@ export default class MochaGroupedReporter extends reporters.Base {
 const getTopMostTitledSuite = (suite: Suite): Suite => {
 	return (suite.parent === undefined || suite.parent.root) ? suite : getTopMostTitledSuite(suite.parent)
 }
+
+export = MochaGroupedReporter
