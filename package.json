@@ -1,7 +1,7 @@
 {
 	"name": "mocha-reporter-json-standard-grouped",
 	"version": "0.1.0",
-	"description": "Report Mocha test runner output in a compact way, grouping together all succesful results belonging to the same suite",
+	"description": "Reports Mocha test runner output to a standardized CI tooling output in JSON format, grouped by successful suites and individual failed tests",
 	"main": "dist/index.js",
 	"files": [
 		"/dist/*.js",
@@ -23,7 +23,7 @@
 		"lint": "eslint --ext ts --cache src/*",
 		"compile": "npm run schema && tsc && rm -rf dist/*.test.d.ts dist/*.test.js.map",
 		"test": "mocha --require ts-node/register test/*.test.*",
-		"build": "npm run clean && npm run lint && npm run compile"
+		"build": "npm run clean && npm run lint && npm run compile && npm run test"
 	},
 	"devDependencies": {
 		"@types/eslint": "^7.2.0",
