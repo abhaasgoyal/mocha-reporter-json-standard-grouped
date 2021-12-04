@@ -1,4 +1,4 @@
-# mocha-reporter-json-standard
+# mocha-reporter-json-standard-grouped
 
 Report Mocha test runner output to a standardized CI tooling output JSON format
 
