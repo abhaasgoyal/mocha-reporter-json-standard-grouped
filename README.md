@@ -8,15 +8,15 @@ Report Mocha test runner output to a [standardized CI tooling output in JSON for
 
 In the process, it groups together all successful results belonging to the same suite and all individual failures.
 
-This package is part of the series of packages for reporting tooling output in a standardized JSON format for use with the [ci-checks-action](https://github.com/marketplace/actions/create-github-checks-from-code-check-script-output-files) Github action.
-
 It supports passing in comma-separated options to the reporter with mocha's `--reporter-options` flag. The available options are:
 
-| Option Name      | Type    | Default   | Description                                                                    |
-| :--------------- | :------ | :-------- | :----------------------------------------------------------------------------- |
-| `quiet`          | boolean | false     | Silence console log output                                                     |
-| `saveJSONVar`    | boolean | true      | Save output to test run statistics (`stats` property of the reporter instance) |
-| `reportFileName` | string? | undefined | If defined, save output to `reportFileName`                                    |
+| Option Name      | Type    | Default   | Description                                                    |
+| :--------------- | :------ | :-------- | :------------------------------------------------------------- |
+| `quiet`          | boolean | false     | Silence console log output                                     |
+| `saveJSONVar`    | boolean | false     | Saves output to the `stats` property of `Mocha.reporters.Base` |
+| `reportFileName` | string? | undefined | If defined, save output to `reportFileName`                    |
+
+This package is part of the series of packages for reporting tooling output in a standardized JSON format for use with the [ci-checks-action](https://github.com/marketplace/actions/create-github-checks-from-code-check-script-output-files) Github action.
 
 Other related packages include:
 
