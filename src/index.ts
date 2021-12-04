@@ -11,7 +11,7 @@ import { ReporterOptions } from "./types"
 export default class MochaGroupedReporter extends reporters.Base {
 
 	reportData?: string
-	stats!: Stats
+	stats: Stats
 
 	constructor(runner: Runner, options: MochaOptions) {
 		super(runner, options)
@@ -45,7 +45,6 @@ export default class MochaGroupedReporter extends reporters.Base {
 		const reporterOptions: ReporterOptions = {
 			quiet: false,
 			saveJSONVar: false,
-			saveJSONFile: false,
 			...options
 		}
 
@@ -109,20 +108,17 @@ export default class MochaGroupedReporter extends reporters.Base {
 
 			const reportData: string = JSON.stringify(results, null, 2)
 
+			// Actions with reporterOptions
 			if (reporterOptions.quiet !== true) {
 				console.log(reportData)
 			}
+
 			if (reporterOptions.saveJSONVar === true) {
 				this.reportData = reportData
 			}
 
-			if (reporterOptions.saveJSONFile === true) {
-				if (typeof reporterOptions.reportFileName === "string") {
-					fs.writeFileSync(reporterOptions.reportFileName, reportData)
-				}
-				else {
-					throw new Error("reportFileName is possibly undefined")
-				}
+			if (typeof reporterOptions.reportFileName === "string") {
+				fs.writeFileSync(reporterOptions.reportFileName, reportData)
 			}
 		})
 	}

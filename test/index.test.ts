@@ -1,10 +1,8 @@
-/*
- * TODO:
- * Tests for testReporterOptions and modularize in options initialization
- */
+/* eslint-disable fp/no-mutation */
+
 import * as assert from "assert"
 import * as fs from "fs"
-import Mocha, { Func, AsyncFunc, Stats } from "mocha"
+import Mocha, { Func, AsyncFunc } from "mocha"
 import MochaGroupedReporter from "../dist/index"
 import { ReporterOptions } from "../src/types"
 
@@ -12,10 +10,8 @@ const { Runner, Suite, Test } = Mocha
 
 const exampleErrObj = { expected: 1, actual: 2 }
 const defaultReporterOptions: ReporterOptions = {
-	quiet: true, // Not display output schema on console
-	saveJSONFile: false,
-	saveJSONVar: false, // Save to JSON variable for persistence after `Runner`
-	reportFileName: '', // Report filename when file is saved
+	quiet: true,
+	saveJSONVar: false,
 }
 
 const createMochaReporter = (mocha: Mocha,
@@ -49,9 +45,15 @@ describe('Grouped Mocha Test Reporter', () => {
 		suite = new Suite("")
 		suite.root = true
 		subSuite1 = new Suite("Group 1")
-		runner = new Runner(suite, false)
+		// @ts-ignore: @types/mocha refers to a deprecated version of creating a new runner instance
+		runner = new Runner(suite, { delay: false })
 		suite.addSuite(subSuite1)
 		initReporter = createMochaReporter(mocha, runner)
+	})
+
+	afterEach(() => {
+		// Dispose the runner listener manually
+		(<any>runner).dispose()
 	})
 
 	describe("Reporter Option Tests", () => {
@@ -122,7 +124,6 @@ describe('Grouped Mocha Test Reporter', () => {
 			const nTests = 7
 			mochaReporter = initReporter({
 				...defaultReporterOptions,
-				saveJSONFile: true,
 				reportFileName: "test/temp-sample.json"
 			})
 			for (let i: number = 0; i < nTests; i++) {
