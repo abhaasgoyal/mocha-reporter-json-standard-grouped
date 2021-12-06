@@ -1,7 +1,7 @@
 {
 	"name": "mocha-reporter-json-standard-grouped",
 	"version": "1.0.1",
-	"description": "Reports Mocha test runner output to a standardized CI tooling output in JSON format, grouped by successful suites and individual failed tests",
+	"description": "Format Mocha test runner output to standardized JSON, grouped by successful suites and individual failed tests",
 	"main": "dist/index.js",
 	"files": [
 		"/dist/*.js",

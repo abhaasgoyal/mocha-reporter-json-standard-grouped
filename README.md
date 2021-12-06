@@ -1,6 +1,6 @@
 # mocha-reporter-json-standard-grouped
 
-Report Mocha test runner output to a standardized CI tooling output JSON format
+Format Mocha test runner output to standardized JSON, grouped by successful suites and individual failed tests
 
 ## Description
 
