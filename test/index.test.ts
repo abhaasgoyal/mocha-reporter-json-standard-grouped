@@ -2,8 +2,8 @@
 
 import * as assert from "assert"
 import * as fs from "fs"
-import Mocha, { Func, AsyncFunc } from "mocha"
-import MochaGroupedReporter from "../dist/index"
+import Mocha = require("mocha")
+import MochaGroupedReporter = require("../dist/index")
 import { ReporterOptions } from "../src/types"
 
 const { Runner, Suite, Test } = Mocha
@@ -14,11 +14,15 @@ const defaultReporterOptions: ReporterOptions = {
 	saveJSONVar: false,
 }
 
+type SecondConstructorArg<C> = C extends {
+	new(_: any, arg: infer A, ...args: any[]): any
+} ? A : never
+
 const createMochaReporter = (mocha: Mocha,
 	runner: Mocha.Runner) =>
 	(reporterOptions: ReporterOptions) =>
 		new (<any>mocha)._reporter(runner, reporterOptions)
-const generateTest = (title: string, doneFn?: Func | AsyncFunc) => new Test(title, doneFn)
+const generateTest = (title: string, doneFn?: SecondConstructorArg<typeof Mocha.Runnable>) => new Test(title, doneFn)
 const passingTest = (title: string) => generateTest(title, () => { })
 const failingTest = (title: string) => generateTest(title, tDone => tDone(new assert.AssertionError(exampleErrObj)))
 const sampleFileCompare = (fileName: string, mochaReporter: Mocha.reporters.Base) => {
