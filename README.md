@@ -21,6 +21,7 @@ This package is part of the series of packages for reporting tooling output in a
 Other related packages include:
 
 - [eslint-formatter-json-standard](https://www.npmjs.com/package/eslint-formatter-json-standard)
+- [mocha-reporter-json-standard](https://github.com/agyemanjp/mocha-reporter-json-standard)
 
 ## Install
 
